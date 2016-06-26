@@ -1,6 +1,6 @@
 # SQS
 
-A wrapper for [nodejs-cassandra](https://github.com/datastax/nodejs-driver) library, providing promises and a set of convenience methods.
+A wrapper for [AWS SDK](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/SQS.html), providing promises and a set of convenience methods.
 
 **NOTE**: this library is not very customizable nor will it be, its intent is to serve as a standard for my personal projects. There are only few tests because its use is extensively tested in component tests.
 
@@ -9,7 +9,9 @@ A wrapper for [nodejs-cassandra](https://github.com/datastax/nodejs-driver) libr
 Run `init(options)` before executing any statements.
 
 ```js
-cassandra.connect({
+import * as sqs from '@nielskrijger/sqs';
+
+sqs.connect({
   region: 'eu-west-1',
 });
 ```
