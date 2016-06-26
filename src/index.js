@@ -180,7 +180,7 @@ function processMessage(queueName, handler, message) {
     return deleteMessage(queueName, message.ReceiptHandle)
       .then(() => result);
   }).catch((error) => {
-    log.error(error, message);
+    eventEmitter.emit('log', 'error', error, messages);
   });
 }
 
@@ -205,7 +205,7 @@ export function poll(queueName, handler, options = {}) {
     if (messages.length > 0) { // There can be only one message at most
       return processMessage(queueName, handler, messages[0]).then((result) => {
         if (result === false) {
-          log.debug(`Stopped polling SQS queue '${queueName}'`);
+          eventEmitter.emit('log', 'debug', `Stopped polling SQS queue '${queueName}'`);
           return null;
         }
         return poll(queueName, handler, options);
