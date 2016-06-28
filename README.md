@@ -16,7 +16,7 @@ sqs.connect({
 });
 ```
 
-Other connection options can be found in the  [AWS SDK](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/SQS.html).
+Other connection options can be found in the [AWS SQS](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/SQS.html) documentation.
 
 ## getUrl(queueName)
 
