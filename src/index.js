@@ -131,7 +131,7 @@ export function receiveMessages(queueName, options = {}) {
         if (!messages) return [];
 
         // Parse JSON message bodies
-        eventEmitter.emit('log', 'debug', `Received ${messages.length} messages from queue '${queueName}'`);
+        eventEmitter.emit('log', 'debug', `Received ${messages.length} message(s) from queue '${queueName}'`);
         const deserialized = [];
         messages.forEach((message) => {
           try {
@@ -199,7 +199,7 @@ function processMessage(queueName, handler, message) {
  */
 export function poll(queueName, handler, options = {}) {
   return receiveMessages(queueName).then((messages) => {
-    eventEmitter.emit('log', 'debug', `Received ${messages.length} messages on SQS queue '${queueName}'`);
+    eventEmitter.emit('log', 'debug', `Received ${messages.length} message(s) on SQS queue '${queueName}'`);
 
     // TODO receive multiple messages at once and process them in sequence or parallel
     if (messages.length > 0) { // There can be only one message at most
