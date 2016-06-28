@@ -1,10 +1,14 @@
 {
   "name": "@nielskrijger/sqs",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Wrapper for Node.js AWS SQS driver",
   "main": "dist/index.js",
   "author": "Niels Krijger <niels@kryger.nl>",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nielskrijger/sqs.git"
+  },
   "devDependencies": {
     "babel-cli": "^6.10.1",
     "babel-core": "^6.10.4",

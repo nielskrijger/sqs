@@ -180,7 +180,7 @@ function processMessage(queueName, handler, message) {
     return deleteMessage(queueName, message.ReceiptHandle)
       .then(() => result);
   }).catch((error) => {
-    eventEmitter.emit('log', 'error', error, messages);
+    eventEmitter.emit('log', 'error', error, message);
   });
 }
 
