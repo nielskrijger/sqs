@@ -133,7 +133,7 @@ export function receiveMessages(queueName, options = {}) {
     const params = {
       QueueUrl: queueUrl,
       MaxNumberOfMessages: (options.maxMessages) ? options.maxMessages : 1,
-      WaitTimeSeconds: (options.waitTimeSeconds) ? options.waitTimeSeconds : 1,
+      WaitTimeSeconds: (options.waitTime) ? options.waitTime : 1,
     };
     return sqs.receiveMessageAsync(params)
       .then(({ Messages: messages }) => {

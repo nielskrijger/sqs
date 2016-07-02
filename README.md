@@ -84,7 +84,7 @@ return sqs.receiveMessages('my-queue').then((messages) => {
 Option          | Default | Description
 ----------------|---------|-----------------------------
 maxMessages     |       1 | Maximum number of messages to retrieve. Between 1-10.
-waitTimeSeconds |       0 | The time for which a ReceiveMessage call will wait for a message to arrive. An integer from 0 to 20 (seconds). When 0 polling switches to short polling which returns immediately.
+waitTime        |       0 | Number of seconds a receiveMessage call will wait for a message to arrive. An integer from 0 to 20. When 0 polling switches to short polling which returns immediately.
 
 ## poll(queueName, handler, options = {})
 
@@ -106,7 +106,7 @@ Option           | Default | Description
 -----------------|---------|-----------------------------
 stopWhenDepleted |   false | Stops polling when no more messages are being received.
 maxMessages      |       1 | Maximum number of messages to retrieve. Between 1-10.
-waitTimeSeconds  |       0 | The time for which a ReceiveMessage call will wait for a message to arrive. An integer from 0 to 20 (seconds). When 0 polling switches to short polling which returns immediately.
+waitTime         |       0 | Number of seconds a receiveMessage call will wait for a message to arrive. An integer from 0 to 20. When 0 polling switches to short polling which returns immediately.
 
 ## deleteMessage(queueName, receiptHandle)
 
