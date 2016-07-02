@@ -17,6 +17,15 @@ export function init(options) {
 }
 
 /**
+ * Resets client connection.
+ *
+ * This function is primarily here for testing purposes.
+ */
+export function reset() {
+  sqs = null;
+}
+
+/**
  * Adds event listener to the end of the listeners array for the event named
  * `eventName`.
  *
@@ -170,40 +179,30 @@ export function deleteMessage(queueName, receiptHandle) {
 }
 
 /**
- * Processes a message in the recursive consume process.
+ * Processes a batch of messages in the recursive consume process.
  *
  * Errors thrown by the handler function should not interrupt the polling
  * process, instead simply log an error.
  */
-function processMessage(queueName, handler, message) {
-  return handler(message).then((result) => {
-    return deleteMessage(queueName, message.ReceiptHandle)
-      .then(() => result);
-  }).catch((error) => {
-    eventEmitter.emit('log', 'error', error, message);
+function processMessages(queueName, handler, messages) {
+  return handler(messages).then(result => {
+    const promises = [];
+    messages.forEach(message => promises.push(deleteMessage(queueName, message.ReceiptHandle)));
+    return Promise.all(messages).then(() => result);
+  }).catch(error => {
+    eventEmitter.emit('log', 'error', error);
   });
 }
 
 /**
  * Recursive function that keeps polling for SQS messages and executes
- * a specified function for each SQS message received.
- *
- * The `handler` function must return a promise. After the promise is resolved
- * it automatically deletes the message from the SQS queue. If the promise
- * returns `false` polling stops after deleting the message.
- *
- * When the message could not be processed succesfully it will be retried or
- * moved to a dead-letter queue depending on your SQS settings. Any error
- * thrown will not stop polling; to stop the polling process `handler`
- * must return `false`.
+ * a specified function for all SQS message received.
  */
 export function poll(queueName, handler, options = {}) {
-  return receiveMessages(queueName).then((messages) => {
+  return receiveMessages(queueName, options).then((messages) => {
     eventEmitter.emit('log', 'debug', `Received ${messages.length} message(s) on SQS queue '${queueName}'`);
-
-    // TODO receive multiple messages at once and process them in sequence or parallel
-    if (messages.length > 0) { // There can be only one message at most
-      return processMessage(queueName, handler, messages[0]).then((result) => {
+    if (messages.length > 0) {
+      return processMessages(queueName, handler, messages).then((result) => {
         if (result === false) {
           eventEmitter.emit('log', 'debug', `Stopped polling SQS queue '${queueName}'`);
           return null;

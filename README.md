@@ -73,9 +73,7 @@ return sqs.sendMessage('my-queue', message);
 
 Retrieves messages from the SQS queue `queueName`.
 
-Returns an array with all messages received or an empty array when none were available. Messages that do not contain a valid JSON message body are silently ignored; that is they will not be returned and will re-appear in the SQS queue after visibility timeout has been reached.
-
-Throws an error if queue could not be found.
+Returns an array with all messages received or an empty array when none were available. Messages that do not contain a valid JSON message body are silently ignored and as a result will re-appear in the SQS queue after their visibility timeout has expired.
 
 ```js
 return sqs.receiveMessages('my-queue').then((messages) => {
@@ -88,26 +86,34 @@ Option          | Default | Description
 maxMessages     |       1 | Maximum number of messages to retrieve. Between 1-10.
 waitTimeSeconds |       0 | The time for which a ReceiveMessage call will wait for a message to arrive. An integer from 0 to 20 (seconds). When 0 polling switches to short polling which returns immediately.
 
+## poll(queueName, handler, options = {})
+
+Keeps polling for SQS messages and executes a `handler` function for all SQS messages received.
+
+The `handler` function must return a promise. After the promise is resolved it automatically deletes the messages from the SQS queue. If the promise returns `false` polling stops after deleting the message. Throw an error to prevent deleting the message but continue polling. This avoids polling to stop unexpectedly.
+
+When the message could not be processed successfully it will be retried or moved to a dead-letter queue depending on your SQS settings.
+
+```js
+function handler(messages) {
+  messages.forEach((message) => console.log(message.ReceiptHandle));
+  return Promise.resolve();
+}
+return sqs.poll('my-queue', handler, { maxMessages: 10 });
+```
+
+Option           | Default | Description
+-----------------|---------|-----------------------------
+stopWhenDepleted |   false | Stops polling when no more messages are being received.
+maxMessages      |       1 | Maximum number of messages to retrieve. Between 1-10.
+waitTimeSeconds  |       0 | The time for which a ReceiveMessage call will wait for a message to arrive. An integer from 0 to 20 (seconds). When 0 polling switches to short polling which returns immediately.
+
 ## deleteMessage(queueName, receiptHandle)
 
-Deletes a received message by it's receiptHandle.
-
-Throws error if queue could not be found.
+Deletes a received message by its `ReceiptHandle`. Deleting a message acknowledges SQS the message has been processed and can be deleted from the queue.
 
 ```js
 return deleteMessage('my-queue', message.ReceiptHandle);
-```
-
-## poll(queueName, handler, options = {})
-
-Keeps polling for SQS messages and executes a `handler` function for each SQS message received.
-
-The `handler` function must return a promise. After the promise is resolved it automatically deletes the message from the SQS queue. If the promise returns `false` polling stops after deleting the message.
-
-When the message could not be processed successfully it will be retried or moved to a dead-letter queue depending on your SQS settings. Any error thrown will not stop polling; to stop the polling process `handler` must return `false`. This avoids polling to stop unexpectedly.
-
-```js
-return sqs.poll('my-queue', (message) => {}, { maxMessages: 1 });
 ```
 
 ## Logging
@@ -121,3 +127,14 @@ sqs.on('log', (level, message, object) => {
 ```
 
 The library returns log messages with levels `debug`, `info` and `error`.
+
+## Tests
+
+```sh
+$ export AWS_ACCESS_KEY_ID="AKIAIOSFODNN7EXAMPLE"
+$ export AWS_SECRET_ACCESS_KEY="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+$ export AWS_DEFAULT_REGION="us-west-1"
+$ npm test
+```
+
+The test will create an SQS queue 'nielskrijger-sqs-tst' if it does not already exists.

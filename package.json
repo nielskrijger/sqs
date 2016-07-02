@@ -1,6 +1,6 @@
 {
   "name": "@nielskrijger/sqs",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Wrapper for Node.js AWS SQS driver",
   "main": "dist/index.js",
   "author": "Niels Krijger <niels@kryger.nl>",
